@@ -101,7 +101,7 @@ export function Sidebar({ isOpen = true, onToggle }: SidebarProps) {
   return (
     <aside
       className={cn(
-        "relative flex flex-col border-l border-[#5D3D55] dark:border-slate-800 bg-[#714B67] dark:bg-[#1E212B] text-white transition-all duration-200 ease-in-out z-30 shrink-0 select-none shadow-sm",
+        "relative hidden md:flex flex-col border-l border-[#5D3D55] dark:border-slate-800 bg-[#714B67] dark:bg-[#1E212B] text-white transition-all duration-200 ease-in-out z-30 shrink-0 select-none shadow-sm",
         collapsed ? "w-16" : "w-60",
         "h-screen sticky top-0"
       )}

@@ -55,9 +55,9 @@ export function DocumentStepper({ currentStep, status }: DocumentStepperProps) {
   const isRejected = status === "REJECTED";
 
   return (
-    <div className="w-full py-4 text-right">
-      {/* Desktop Horizontal Stepper */}
-      <div className="relative flex items-center justify-between">
+    <div className="w-full py-4 text-right overflow-x-auto no-scrollbar">
+      {/* Desktop & Mobile Horizontal Stepper */}
+      <div className="relative flex items-center justify-between min-w-[480px] md:min-w-0 px-3">
         {/* Connecting line */}
         <div className="absolute top-5 left-6 right-6 -z-0 h-1 bg-muted">
           <div

@@ -1,5 +1,5 @@
 import "./globals.css";
-import type { Metadata } from "next";
+import type { Metadata, Viewport } from "next";
 import { Noto_Kufi_Arabic } from "next/font/google";
 import { ThemeProvider } from "@/components/theme-provider";
 import { LayoutWrapper } from "@/components/layout/layout-wrapper";
@@ -11,6 +11,13 @@ const notoKufiArabic = Noto_Kufi_Arabic({
   display: "swap",
   variable: "--font-noto-kufi",
 });
+
+export const viewport: Viewport = {
+  width: "device-width",
+  initialScale: 1,
+  maximumScale: 1,
+  userScalable: false,
+};
 
 export const metadata: Metadata = {
   title: "سیستەمی بەڕێوەبردنی شارەوانییەکانی گەرمیان | Odoo Enterprise ERP",

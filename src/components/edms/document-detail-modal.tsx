@@ -89,8 +89,8 @@ export function DocumentDetailModal({
   };
 
   return (
-    <div className="fixed inset-0 z-50 flex items-center justify-center bg-black/60 p-4 backdrop-blur-sm animate-in fade-in">
-      <div className="relative w-full max-w-3xl max-h-[90vh] overflow-y-auto rounded-3xl border border-border bg-card p-6 shadow-2xl text-right">
+    <div className="fixed inset-0 z-50 flex items-center justify-center bg-black/60 p-2 sm:p-4 backdrop-blur-sm animate-in fade-in">
+      <div className="relative w-full max-w-3xl max-h-[92vh] overflow-y-auto rounded-2xl sm:rounded-3xl border border-border bg-card p-4 sm:p-6 shadow-2xl text-right">
         {/* Header */}
         <div className="flex items-center justify-between border-b border-border pb-4 mb-4">
           <div className="flex items-center gap-2.5">
@@ -320,12 +320,12 @@ export function DocumentDetailModal({
 
             {/* Standard Action Buttons */}
             {!actionType && (
-              <div className="flex flex-wrap items-center justify-end gap-2 pt-2">
+              <div className="flex flex-col sm:flex-row flex-wrap items-stretch sm:items-center justify-end gap-2 pt-2">
                 <button
                   type="button"
                   disabled={loading}
                   onClick={() => handleExecuteAction("APPROVE")}
-                  className="rounded-xl bg-emerald-600 px-4 py-2.5 text-xs font-bold text-white shadow-md hover:bg-emerald-500 flex items-center gap-1.5 transition-all"
+                  className="rounded-xl bg-emerald-600 px-4 py-2.5 min-h-[44px] text-xs font-bold text-white shadow-md hover:bg-emerald-500 flex items-center justify-center gap-1.5 transition-all cursor-pointer"
                 >
                   <CheckCircle2 className="h-4 w-4" />
                   <span>ڕەزامەندم (Approve)</span>
@@ -334,16 +334,16 @@ export function DocumentDetailModal({
                 <button
                   type="button"
                   onClick={() => setActionType("FORWARD")}
-                  className="rounded-xl bg-blue-600 px-4 py-2.5 text-xs font-bold text-white shadow-md hover:bg-blue-500 flex items-center gap-1.5 transition-all"
+                  className="rounded-xl bg-blue-600 px-4 py-2.5 min-h-[44px] text-xs font-bold text-white shadow-md hover:bg-blue-500 flex items-center justify-center gap-1.5 transition-all cursor-pointer"
                 >
                   <Forward className="h-4 w-4" />
-                  <span>ئاڕاستەکردن بۆ لێکۆڵینەوە (Forward with notes)</span>
+                  <span>ئاڕاستەکردن بۆ لێکۆڵینەوە</span>
                 </button>
 
                 <button
                   type="button"
                   onClick={() => setActionType("REJECT")}
-                  className="rounded-xl bg-red-600 px-4 py-2.5 text-xs font-bold text-white shadow-md hover:bg-red-500 flex items-center gap-1.5 transition-all"
+                  className="rounded-xl bg-red-600 px-4 py-2.5 min-h-[44px] text-xs font-bold text-white shadow-md hover:bg-red-500 flex items-center justify-center gap-1.5 transition-all cursor-pointer"
                 >
                   <XCircle className="h-4 w-4" />
                   <span>ڕەتکرایەوە (Reject)</span>

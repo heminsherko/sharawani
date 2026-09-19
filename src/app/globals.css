@@ -322,5 +322,9 @@
   animation: pulse-overlap 1.2s infinite ease-in-out;
 }
 
-
-
+/* Mobile Safari Input Auto-Zoom Prevention & Touch Target Optimization */
+@media screen and (max-width: 767px) {
+  input, select, textarea {
+    font-size: 16px !important;
+  }
+}

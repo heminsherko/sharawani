@@ -284,6 +284,13 @@ export function Topbar({ currentUser }: TopbarProps) {
     }
   }, []);
 
+  // Listen for bottom-bar app switcher event
+  React.useEffect(() => {
+    const handler = () => setAppSwitcherOpen(true);
+    window.addEventListener("garmian-open-apps", handler);
+    return () => window.removeEventListener("garmian-open-apps", handler);
+  }, []);
+
   const activeMuniName = selectedMuni
     ? selectedMuni.nameKrd
     : currentUser
@@ -291,6 +298,24 @@ export function Topbar({ currentUser }: TopbarProps) {
     : garmianMunicipalities[0].nameKrd;
 
   const isHq = selectedMuni ? selectedMuni.isHeadquarter : (currentUser?.isHeadquarter ?? true);
+
+  // Shortened municipality badge for compact mobile screens
+  const shortMuniName = React.useMemo(() => {
+    if (isHq) return "HQ گەرمیان";
+    if (activeMuniName.includes("کەلار")) return "کەلار";
+    if (activeMuniName.includes("کفری")) return "کفری";
+    if (activeMuniName.includes("ڕزگاری")) return "ڕزگاری";
+    if (activeMuniName.includes("پێباز")) return "پێباز";
+    if (activeMuniName.includes("سەرقەڵا")) return "سەرقەڵا";
+    if (activeMuniName.includes("نەوجول")) return "نەوجول";
+    if (activeMuniName.includes("شێخ تەویل")) return "شێخ تەویل";
+    if (activeMuniName.includes("کۆکس")) return "کۆکس";
+    if (activeMuniName.includes("ئاوەسپی")) return "ئاوەسپی";
+    if (activeMuniName.includes("مەیدان")) return "مەیدان";
+    if (activeMuniName.includes("قۆرەتوو")) return "قۆرەتوو";
+    if (activeMuniName.includes("بەمۆ")) return "بەمۆ";
+    return activeMuniName.slice(0, 10);
+  }, [isHq, activeMuniName]);
 
   // Authentic Odoo Breadcrumb Hierarchy
   function getCurrentModuleName(): string {
@@ -327,20 +352,20 @@ export function Topbar({ currentUser }: TopbarProps) {
   }
 
   return (
-    <header className="sticky top-0 z-40 flex h-12 w-full items-center justify-between bg-[#714B67] text-white px-3 sm:px-4 shadow-sm select-none border-b border-[#5D3D55]">
+    <header className="sticky top-0 z-40 flex h-14 md:h-12 w-full items-center justify-between bg-[#714B67] text-white px-2.5 sm:px-4 shadow-sm select-none border-b border-[#5D3D55]">
       {/* RIGHT SIDE (RTL): Odoo App Switcher (Waffle) & Module Breadcrumb */}
-      <div className="flex items-center gap-2 sm:gap-2.5">
+      <div className="flex items-center gap-1.5 sm:gap-2.5">
         {/* Odoo App Switcher (Waffle Menu) */}
         <button
           onClick={() => setAppSwitcherOpen(!appSwitcherOpen)}
           title="ئەپڵیکەیشنەکانی سیستەم (Odoo App Switcher)"
           aria-label="ئەپڵیکەیشنەکان"
           className={cn(
-            "flex h-8 w-8 items-center justify-center rounded hover:bg-white/15 transition-colors cursor-pointer",
+            "flex h-10 w-10 sm:h-8 sm:w-8 items-center justify-center rounded-lg sm:rounded hover:bg-white/15 transition-colors cursor-pointer",
             appSwitcherOpen && "bg-white/20"
           )}
         >
-          <Grid className="h-4 w-4 text-white" />
+          <Grid className="h-5 w-5 sm:h-4 sm:w-4 text-white" />
         </button>
 
         {/* Directorate Brand & Active Module Breadcrumbs */}
@@ -349,14 +374,14 @@ export function Topbar({ currentUser }: TopbarProps) {
             شارەوانییەکانی گەرمیان
           </span>
           <span className="text-white/40 hidden lg:inline">/</span>
-          <span className="font-bold text-white tracking-wide truncate max-w-[160px] sm:max-w-none">
+          <span className="font-bold text-white tracking-wide truncate max-w-[120px] sm:max-w-none text-xs sm:text-xs">
             {getCurrentModuleName()}
           </span>
         </div>
       </div>
 
-      {/* CENTER: Multi-Municipality Switcher & Quick Role Switcher */}
-      <div className="flex items-center gap-2">
+      {/* CENTER & LEFT: Multi-Municipality Switcher & Quick Role Switcher */}
+      <div className="flex items-center gap-1.5 sm:gap-2">
         {/* 1. Quick Persona Switcher Dropdown (7 Roles) */}
         <div className="relative">
           <button
@@ -365,7 +390,7 @@ export function Topbar({ currentUser }: TopbarProps) {
               setMuniDropdownOpen(false);
               setUserDropdownOpen(false);
             }}
-            className="flex items-center gap-1.5 rounded bg-amber-400/20 hover:bg-amber-400/30 px-2.5 py-1 text-xs text-white transition-colors border border-amber-300/30 cursor-pointer"
+            className="flex items-center gap-1 sm:gap-1.5 rounded-lg sm:rounded bg-amber-400/20 hover:bg-amber-400/30 px-2 sm:px-2.5 py-1.5 sm:py-1 text-xs text-white transition-colors border border-amber-300/30 cursor-pointer min-h-[36px] sm:min-h-0"
             title="گۆڕینی ئەکاونت و ڕۆڵی بەکارهێنەر لەناو سیستەم"
           >
             {switchingRole ? (
@@ -385,7 +410,7 @@ export function Topbar({ currentUser }: TopbarProps) {
                 className="fixed inset-0 z-40"
                 onClick={() => setPersonaSwitcherOpen(false)}
               />
-              <div className="absolute right-0 sm:left-1/2 sm:-translate-x-1/2 top-full mt-1.5 w-72 rounded border border-slate-200 dark:border-slate-800 bg-white dark:bg-slate-900 p-2 shadow-xl z-50 text-xs text-slate-800 dark:text-slate-200 space-y-1">
+              <div className="absolute right-0 sm:left-1/2 sm:-translate-x-1/2 top-full mt-1.5 w-72 rounded-xl border border-slate-200 dark:border-slate-800 bg-white dark:bg-slate-900 p-2 shadow-xl z-50 text-xs text-slate-800 dark:text-slate-200 space-y-1">
                 <div className="px-2 py-1 text-[10px] font-bold uppercase tracking-wider text-slate-500 border-b border-slate-100 dark:border-slate-800 flex items-center justify-between">
                   <span>گۆڕینی ڕاستەوخۆی ڕۆڵ (٧ ئەکاونت)</span>
                   <span className="font-mono text-[9px] text-[#017E84] font-bold">1-Click</span>
@@ -402,7 +427,7 @@ export function Topbar({ currentUser }: TopbarProps) {
                         handleSwitchPersona(p.key);
                       }}
                       className={cn(
-                        "w-full text-right p-2 rounded flex items-center justify-between transition-colors cursor-pointer",
+                        "w-full text-right p-2 rounded-lg flex items-center justify-between transition-colors cursor-pointer min-h-[44px]",
                         isCurrent
                           ? "bg-teal-50 dark:bg-teal-950/40 border border-[#017E84]/30"
                           : "hover:bg-slate-100 dark:hover:bg-slate-800"
@@ -434,14 +459,17 @@ export function Topbar({ currentUser }: TopbarProps) {
               setPersonaSwitcherOpen(false);
               setUserDropdownOpen(false);
             }}
-            className="flex items-center gap-1.5 rounded bg-white/10 hover:bg-white/20 px-2.5 py-1 text-xs text-white transition-colors border border-white/15 cursor-pointer"
+            className="flex items-center gap-1 sm:gap-1.5 rounded-lg sm:rounded bg-white/10 hover:bg-white/20 px-2 sm:px-2.5 py-1.5 sm:py-1 text-xs text-white transition-colors border border-white/15 cursor-pointer min-h-[36px] sm:min-h-0"
             aria-expanded={muniDropdownOpen}
           >
-            <Building2 className="h-3.5 w-3.5 text-emerald-300" />
-            <span className="font-bold truncate max-w-[120px] sm:max-w-[180px]">
-              {isHq ? "دیوانی بەڕێوەبەرایەتی گشتی" : activeMuniName}
+            <Building2 className="h-3.5 w-3.5 text-emerald-300 shrink-0" />
+            <span className="font-bold truncate max-w-[85px] sm:max-w-[180px]">
+              <span className="sm:hidden">{shortMuniName}</span>
+              <span className="hidden sm:inline">
+                {isHq ? "دیوانی بەڕێوەبەرایەتی گشتی" : activeMuniName}
+              </span>
             </span>
-            <ChevronDown className="h-3 w-3 text-white/70" />
+            <ChevronDown className="h-3 w-3 text-white/70 shrink-0" />
           </button>
 
           {/* Multi-Company / Municipality Dropdown */}
@@ -451,7 +479,7 @@ export function Topbar({ currentUser }: TopbarProps) {
                 className="fixed inset-0 z-40"
                 onClick={() => setMuniDropdownOpen(false)}
               />
-              <div className="absolute left-1/2 -translate-x-1/2 top-full mt-1.5 w-84 max-h-96 overflow-y-auto rounded border border-slate-200 dark:border-slate-800 bg-white dark:bg-slate-900 p-1.5 shadow-xl z-50 text-xs text-slate-800 dark:text-slate-200">
+              <div className="absolute left-0 sm:left-1/2 sm:-translate-x-1/2 top-full mt-1.5 w-80 sm:w-84 max-h-96 overflow-y-auto rounded-xl border border-slate-200 dark:border-slate-800 bg-white dark:bg-slate-900 p-1.5 shadow-xl z-50 text-xs text-slate-800 dark:text-slate-200">
                 <div className="px-3 py-1.5 text-[10px] font-bold uppercase tracking-wider text-slate-500 border-b border-slate-100 dark:border-slate-800 mb-1 flex items-center justify-between">
                   <span>دەسەڵاتی کارگێڕی (١٣ شارەوانی فەرمی)</span>
                   <span className="font-mono text-[9px] text-[#017E84] font-bold">١٣ لق</span>
@@ -479,22 +507,22 @@ export function Topbar({ currentUser }: TopbarProps) {
                           window.dispatchEvent(
                             new CustomEvent("garmian-muni-changed", { detail: muni })
                           );
-                        } catch (err) {
-                          console.error(err);
+                        } catch {
+                          // ignore
                         }
                       }}
                       className={cn(
-                        "flex w-full items-center justify-between rounded px-2.5 py-1.5 text-right text-xs transition-colors mb-0.5 cursor-pointer",
+                        "w-full text-right px-3 py-2 rounded-lg flex items-center justify-between transition-colors cursor-pointer min-h-[44px]",
                         isSelected
-                          ? "bg-[#017E84] text-white font-bold"
-                          : "hover:bg-slate-100 dark:hover:bg-slate-800 text-slate-700 dark:text-slate-200"
+                          ? "bg-[#714B67]/10 dark:bg-[#714B67]/20 text-[#714B67] dark:text-purple-300 font-bold"
+                          : "hover:bg-slate-100 dark:hover:bg-slate-800"
                       )}
                     >
-                      <div className="flex flex-col text-right">
-                        <span>{muni.nameKrd}</span>
-                        <span className="text-[10px] opacity-75 font-mono">{muni.tier}</span>
+                      <div className="flex items-center gap-2">
+                        <Building2 className="h-3.5 w-3.5 text-slate-400" />
+                        <span className="text-xs">{muni.nameKrd}</span>
                       </div>
-                      {isSelected && <Check className="h-3.5 w-3.5 shrink-0" />}
+                      {isSelected && <Check className="h-4 w-4 text-[#017E84]" />}
                     </button>
                   );
                 })}
@@ -502,75 +530,62 @@ export function Topbar({ currentUser }: TopbarProps) {
             </>
           )}
         </div>
-      </div>
 
-      {/* LEFT SIDE (RTL): Activity Bell, Theme Toggle & User Profile */}
-      <div className="flex items-center gap-2">
-        {/* Notification Activity Bell */}
-        <button
-          title="ئاگاداری و چالاکییە نوێیەکان"
-          className="relative flex h-8 w-8 items-center justify-center rounded hover:bg-white/15 text-white/90 hover:text-white transition-colors cursor-pointer"
-        >
-          <Bell className="h-4 w-4" />
-          <span className="absolute top-1 right-1 flex h-2 w-2 rounded-full bg-emerald-400" />
-        </button>
-
-        {/* Theme Toggle (Dark / Light) */}
-        <div className="text-white hover:text-white">
+        {/* 3. Theme Toggle & Profile Avatar */}
+        <div className="flex items-center gap-1">
           <ThemeToggle />
-        </div>
 
-        {/* User Profile Pill */}
-        <div className="relative">
-          <button
-            onClick={() => {
-              setUserDropdownOpen(!userDropdownOpen);
-              setPersonaSwitcherOpen(false);
-              setMuniDropdownOpen(false);
-            }}
-            className="flex items-center gap-2 rounded bg-white/10 hover:bg-white/20 px-2 py-1 text-right text-xs transition-colors border border-white/15 cursor-pointer"
-          >
-            <div className="flex h-5 w-5 items-center justify-center rounded-full bg-[#017E84] text-white font-bold text-[10px]">
-              <User className="h-3 w-3" />
-            </div>
-            <span className="hidden sm:inline font-bold text-[11px] text-white truncate max-w-[120px]">
-              {currentUser?.fullName || "بەڕێوەبەری سیستەم"}
-            </span>
-            <ChevronDown className="h-3 w-3 text-white/70" />
-          </button>
-
-          {userDropdownOpen && (
-            <>
-              <div
-                className="fixed inset-0 z-40"
-                onClick={() => setUserDropdownOpen(false)}
-              />
-              <div className="absolute left-0 top-full mt-1.5 w-60 rounded border border-slate-200 dark:border-slate-800 bg-white dark:bg-slate-900 p-2 shadow-xl z-50 text-xs text-slate-800 dark:text-slate-200 space-y-2">
-                <div className="border-b border-slate-100 dark:border-slate-800 pb-2 text-right">
-                  <p className="font-bold text-slate-900 dark:text-white text-xs">
-                    {currentUser?.fullName || "ئەندازیار بەرزان محەمەد"}
-                  </p>
-                  <p className="text-[10px] font-mono text-slate-500 mt-0.5">
-                    {currentUser?.role || "DIRECTOR_GENERAL"}
-                  </p>
-                  <div className="mt-1.5">
-                    <span className="odoo-badge-approved text-[9px] py-0">
-                      {isHq ? "دەسەڵاتی سەرتاسەری" : "دەسەڵاتی ناوچەیی"}
-                    </span>
-                  </div>
-                </div>
-
-                <button
-                  type="button"
-                  onClick={handleSignOut}
-                  className="flex w-full items-center justify-between rounded px-2 py-1.5 text-right text-xs text-red-700 hover:bg-red-50 dark:hover:bg-red-950/20 font-bold cursor-pointer"
-                >
-                  <span>دەرچوون (Log Out)</span>
-                  <LogOut className="h-3.5 w-3.5" />
-                </button>
+          <div className="relative">
+            <button
+              onClick={() => {
+                setUserDropdownOpen(!userDropdownOpen);
+                setMuniDropdownOpen(false);
+                setPersonaSwitcherOpen(false);
+              }}
+              className="flex items-center gap-1.5 rounded-lg sm:rounded bg-white/10 hover:bg-white/20 p-1.5 sm:px-2 sm:py-1 text-right text-xs transition-colors border border-white/15 cursor-pointer min-h-[36px] sm:min-h-0"
+            >
+              <div className="flex h-6 w-6 sm:h-5 sm:w-5 items-center justify-center rounded-full bg-[#017E84] text-white font-bold text-[11px] sm:text-[10px]">
+                <User className="h-3.5 w-3.5 sm:h-3 sm:w-3" />
               </div>
-            </>
-          )}
+              <span className="hidden sm:inline font-bold text-[11px] text-white truncate max-w-[120px]">
+                {currentUser?.fullName || "بەڕێوەبەری سیستەم"}
+              </span>
+              <ChevronDown className="h-3 w-3 text-white/70 hidden sm:inline" />
+            </button>
+
+            {userDropdownOpen && (
+              <>
+                <div
+                  className="fixed inset-0 z-40"
+                  onClick={() => setUserDropdownOpen(false)}
+                />
+                <div className="absolute left-0 top-full mt-1.5 w-60 rounded-xl border border-slate-200 dark:border-slate-800 bg-white dark:bg-slate-900 p-2 shadow-xl z-50 text-xs text-slate-800 dark:text-slate-200 space-y-2">
+                  <div className="border-b border-slate-100 dark:border-slate-800 pb-2 text-right">
+                    <p className="font-bold text-slate-900 dark:text-white text-xs">
+                      {currentUser?.fullName || "ئەندازیار بەرزان محەمەد"}
+                    </p>
+                    <p className="text-[10px] font-mono text-slate-500 mt-0.5">
+                      {currentUser?.role || "DIRECTOR_GENERAL"}
+                    </p>
+                    <div className="mt-1.5">
+                      <span className="odoo-badge-approved text-[9px] py-0">
+                        {isHq ? "دەسەڵاتی سەرتاسەری" : "دەسەڵاتی ناوچەیی"}
+                      </span>
+                    </div>
+                  </div>
+
+                  <button
+                    type="button"
+                    onClick={handleSignOut}
+                    className="flex w-full items-center justify-between rounded-lg px-2 py-2 text-right text-xs text-red-700 hover:bg-red-50 dark:hover:bg-red-950/20 font-bold cursor-pointer min-h-[44px]"
+                  >
+                    <span>دەرچوون (Log Out)</span>
+                    <LogOut className="h-4 w-4" />
+                  </button>
+                </div>
+              </>
+            )}
+          </div>
         </div>
       </div>
 
@@ -581,11 +596,11 @@ export function Topbar({ currentUser }: TopbarProps) {
             className="fixed inset-0 z-50 bg-black/60 backdrop-blur-xs"
             onClick={() => setAppSwitcherOpen(false)}
           />
-          <div className="fixed top-12 right-0 left-0 z-50 p-6 sm:p-10 max-w-4xl mx-auto">
-            <div className="bg-white dark:bg-slate-900 rounded-xl border border-slate-200 dark:border-slate-800 shadow-2xl p-6 text-right">
-              <div className="flex items-center justify-between pb-4 border-b border-slate-200 dark:border-slate-800 mb-6">
+          <div className="fixed inset-0 sm:inset-auto sm:top-14 sm:right-0 sm:left-0 z-50 p-4 sm:p-6 max-w-4xl mx-auto flex flex-col justify-center sm:justify-start overflow-y-auto">
+            <div className="bg-white dark:bg-slate-900 rounded-2xl border border-slate-200 dark:border-slate-800 shadow-2xl p-5 sm:p-6 text-right max-h-[92vh] overflow-y-auto">
+              <div className="flex items-center justify-between pb-3 border-b border-slate-200 dark:border-slate-800 mb-5">
                 <div>
-                  <h3 className="text-base font-semibold text-slate-900 dark:text-slate-100">
+                  <h3 className="text-base font-bold text-slate-900 dark:text-slate-100">
                     مۆدیوول و ئەپڵیکەیشنەکانی Odoo Gov ERP
                   </h3>
                   <p className="text-xs text-slate-500">
@@ -594,14 +609,15 @@ export function Topbar({ currentUser }: TopbarProps) {
                 </div>
                 <button
                   onClick={() => setAppSwitcherOpen(false)}
-                  className="p-1 rounded-md text-slate-400 hover:text-slate-600 hover:bg-slate-100 dark:hover:bg-slate-800 cursor-pointer"
+                  className="h-10 w-10 sm:h-8 sm:w-8 rounded-lg text-slate-400 hover:text-slate-600 hover:bg-slate-100 dark:hover:bg-slate-800 cursor-pointer flex items-center justify-center"
+                  aria-label="داخستنی ئەپەکان"
                 >
-                  <X className="h-5 w-5" />
+                  <X className="h-6 w-6 sm:h-5 sm:w-5" />
                 </button>
               </div>
 
               {/* App Grid */}
-              <div className="grid grid-cols-2 sm:grid-cols-4 gap-4">
+              <div className="grid grid-cols-2 sm:grid-cols-4 gap-3 sm:gap-4">
                 {odooApps.map((app) => {
                   const Icon = app.icon;
                   return (
@@ -609,11 +625,11 @@ export function Topbar({ currentUser }: TopbarProps) {
                       key={app.name}
                       href={app.href}
                       onClick={() => setAppSwitcherOpen(false)}
-                      className="flex flex-col items-center justify-center p-4 rounded-lg border border-slate-100 dark:border-slate-800 hover:border-[#017E84] hover:shadow-md transition-all group text-center"
+                      className="flex flex-col items-center justify-center p-3.5 sm:p-4 rounded-xl border border-slate-100 dark:border-slate-800 hover:border-[#017E84] hover:shadow-md transition-all group text-center min-h-[90px] active:scale-95"
                     >
                       <div
                         className={cn(
-                          "h-12 w-12 rounded-xl flex items-center justify-center text-white mb-2 shadow-sm transition-transform group-hover:scale-105",
+                          "h-12 w-12 sm:h-12 sm:w-12 rounded-2xl flex items-center justify-center text-white mb-2 shadow-sm transition-transform group-hover:scale-105",
                           app.bg
                         )}
                       >

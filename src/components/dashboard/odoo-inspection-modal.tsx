@@ -161,91 +161,93 @@ export function OdooInspectionModal({
         </div>
 
         {/* 2. ODOO WORKFLOW PIPELINE STATUS BAR & ACTIONS */}
-        <div className="px-5 py-2.5 border-b border-slate-200 dark:border-slate-800 bg-white dark:bg-slate-900 flex flex-wrap items-center justify-between gap-3">
+        <div className="px-3 sm:px-5 py-2.5 border-b border-slate-200 dark:border-slate-800 bg-white dark:bg-slate-900 flex flex-col sm:flex-row sm:items-center justify-between gap-2.5">
           {/* Action Buttons */}
-          <div className="flex items-center gap-2">
+          <div className="flex flex-wrap items-center gap-1.5 sm:gap-2">
             <button
               onClick={handleApprove}
-              className="px-3 py-1.5 rounded bg-[#017E84] hover:bg-[#00676C] text-white text-xs font-bold transition-colors flex items-center gap-1.5 shadow-xs cursor-pointer"
+              className="px-3 py-2 sm:py-1.5 rounded bg-[#017E84] hover:bg-[#00676C] text-white text-xs font-bold transition-colors flex items-center gap-1.5 shadow-xs cursor-pointer min-h-[38px]"
             >
               <CheckCircle2 className="h-4 w-4" />
               <span>پەسەندکردن (Approve)</span>
             </button>
             <button
               onClick={handleForward}
-              className="px-3 py-1.5 rounded bg-slate-100 dark:bg-slate-800 hover:bg-slate-200 text-slate-700 dark:text-slate-200 text-xs font-bold transition-colors flex items-center gap-1.5 border border-slate-300 dark:border-slate-700 cursor-pointer"
+              className="px-3 py-2 sm:py-1.5 rounded bg-slate-100 dark:bg-slate-800 hover:bg-slate-200 text-slate-700 dark:text-slate-200 text-xs font-bold transition-colors flex items-center gap-1.5 border border-slate-300 dark:border-slate-700 cursor-pointer min-h-[38px]"
             >
               <Send className="h-3.5 w-3.5" />
               <span>ئاڕاستەکردن (Forward)</span>
             </button>
             <button
               onClick={handleReject}
-              className="px-3 py-1.5 rounded bg-red-50 dark:bg-red-950/40 hover:bg-red-100 text-red-700 dark:text-red-300 text-xs font-bold transition-colors flex items-center gap-1.5 border border-red-200 dark:border-red-900/50 cursor-pointer"
+              className="px-3 py-2 sm:py-1.5 rounded bg-red-50 dark:bg-red-950/40 hover:bg-red-100 text-red-700 dark:text-red-300 text-xs font-bold transition-colors flex items-center gap-1.5 border border-red-200 dark:border-red-900/50 cursor-pointer min-h-[38px]"
             >
               <XCircle className="h-3.5 w-3.5" />
               <span>ڕەتکردنەوە (Reject)</span>
             </button>
             <button
               onClick={handlePrint}
-              className="px-3 py-1.5 rounded border border-slate-300 dark:border-slate-700 hover:bg-slate-100 dark:hover:bg-slate-800 text-slate-700 dark:text-slate-300 text-xs font-bold flex items-center gap-1.5 transition-colors cursor-pointer"
+              className="px-3 py-2 sm:py-1.5 rounded border border-slate-300 dark:border-slate-700 hover:bg-slate-100 dark:hover:bg-slate-800 text-slate-700 dark:text-slate-300 text-xs font-bold flex items-center gap-1.5 transition-colors cursor-pointer min-h-[38px]"
             >
               <Printer className="h-3.5 w-3.5 text-slate-500" />
-              <span>چاپکردنی بەڵگەنامە</span>
+              <span>چاپ</span>
             </button>
           </div>
 
           {/* Workflow Pipeline Stepper: [ڕەشنووس ➔ لەژێر پشکنین ➔ پەسەندکراوی دیوان ➔ تەواوکراو] */}
-          <div className="flex items-center text-xs border border-slate-200 dark:border-slate-700 rounded overflow-hidden select-none">
-            <div
-              onClick={() => setStage("DRAFT")}
-              className={cn(
-                "px-3 py-1 font-bold flex items-center gap-1 cursor-pointer transition-colors",
-                stage === "DRAFT"
-                  ? "bg-[#714B67] text-white"
-                  : "bg-slate-50 dark:bg-slate-800 text-slate-500 hover:bg-slate-100"
-              )}
-            >
-              <span>ڕەشنووس</span>
-              <span className="text-[10px] font-mono opacity-80">(Draft)</span>
-            </div>
-            <ChevronLeft className="h-3.5 w-3.5 text-slate-300 bg-slate-100 dark:bg-slate-800" />
-            <div
-              onClick={() => setStage("IN_REVIEW")}
-              className={cn(
-                "px-3 py-1 font-bold flex items-center gap-1 cursor-pointer transition-colors",
-                stage === "IN_REVIEW"
-                  ? "bg-[#9A6700] text-white"
-                  : "bg-slate-50 dark:bg-slate-800 text-slate-500 hover:bg-slate-100"
-              )}
-            >
-              <span>لەژێر پشکنین</span>
-              <span className="text-[10px] font-mono opacity-80">(Review)</span>
-            </div>
-            <ChevronLeft className="h-3.5 w-3.5 text-slate-300 bg-slate-100 dark:bg-slate-800" />
-            <div
-              onClick={() => setStage("APPROVED")}
-              className={cn(
-                "px-3 py-1 font-bold flex items-center gap-1 cursor-pointer transition-colors",
-                stage === "APPROVED"
-                  ? "bg-[#017E84] text-white"
-                  : "bg-slate-50 dark:bg-slate-800 text-slate-500 hover:bg-slate-100"
-              )}
-            >
-              <span>پەسەندکراوی دیوان</span>
-              <span className="text-[10px] font-mono opacity-80">(Approved)</span>
-            </div>
-            <ChevronLeft className="h-3.5 w-3.5 text-slate-300 bg-slate-100 dark:bg-slate-800" />
-            <div
-              onClick={() => setStage("ARCHIVED")}
-              className={cn(
-                "px-3 py-1 font-bold flex items-center gap-1 cursor-pointer transition-colors",
-                stage === "ARCHIVED"
-                  ? "bg-[#2E7D32] text-white"
-                  : "bg-slate-50 dark:bg-slate-800 text-slate-500 hover:bg-slate-100"
-              )}
-            >
-              <span>تەواوکراو</span>
-              <span className="text-[10px] font-mono opacity-80">(Done)</span>
+          <div className="overflow-x-auto no-scrollbar py-1">
+            <div className="flex items-center text-xs border border-slate-200 dark:border-slate-700 rounded overflow-hidden select-none shrink-0 min-w-[340px] sm:min-w-0">
+              <div
+                onClick={() => setStage("DRAFT")}
+                className={cn(
+                  "px-3 py-1 font-bold flex items-center gap-1 cursor-pointer transition-colors",
+                  stage === "DRAFT"
+                    ? "bg-[#714B67] text-white"
+                    : "bg-slate-50 dark:bg-slate-800 text-slate-500 hover:bg-slate-100"
+                )}
+              >
+                <span>ڕەشنووس</span>
+                <span className="text-[10px] font-mono opacity-80">(Draft)</span>
+              </div>
+              <ChevronLeft className="h-3.5 w-3.5 text-slate-300 bg-slate-100 dark:bg-slate-800 shrink-0" />
+              <div
+                onClick={() => setStage("IN_REVIEW")}
+                className={cn(
+                  "px-3 py-1 font-bold flex items-center gap-1 cursor-pointer transition-colors",
+                  stage === "IN_REVIEW"
+                    ? "bg-[#9A6700] text-white"
+                    : "bg-slate-50 dark:bg-slate-800 text-slate-500 hover:bg-slate-100"
+                )}
+              >
+                <span>لەژێر پشکنین</span>
+                <span className="text-[10px] font-mono opacity-80">(Review)</span>
+              </div>
+              <ChevronLeft className="h-3.5 w-3.5 text-slate-300 bg-slate-100 dark:bg-slate-800 shrink-0" />
+              <div
+                onClick={() => setStage("APPROVED")}
+                className={cn(
+                  "px-3 py-1 font-bold flex items-center gap-1 cursor-pointer transition-colors",
+                  stage === "APPROVED"
+                    ? "bg-[#017E84] text-white"
+                    : "bg-slate-50 dark:bg-slate-800 text-slate-500 hover:bg-slate-100"
+                )}
+              >
+                <span>پەسەندکراوی دیوان</span>
+                <span className="text-[10px] font-mono opacity-80">(Approved)</span>
+              </div>
+              <ChevronLeft className="h-3.5 w-3.5 text-slate-300 bg-slate-100 dark:bg-slate-800 shrink-0" />
+              <div
+                onClick={() => setStage("ARCHIVED")}
+                className={cn(
+                  "px-3 py-1 font-bold flex items-center gap-1 cursor-pointer transition-colors",
+                  stage === "ARCHIVED"
+                    ? "bg-[#2E7D32] text-white"
+                    : "bg-slate-50 dark:bg-slate-800 text-slate-500 hover:bg-slate-100"
+                )}
+              >
+                <span>تەواوکراو</span>
+                <span className="text-[10px] font-mono opacity-80">(Done)</span>
+              </div>
             </div>
           </div>
         </div>

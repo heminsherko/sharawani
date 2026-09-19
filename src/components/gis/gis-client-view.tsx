@@ -490,8 +490,7 @@ export function GISClientView({
 
       {/* 4. WEB-GIS INTERACTIVE MAP CONTAINER */}
       <div
-        style={{ height: "650px", width: "100%" }}
-        className="relative h-[650px] min-h-[650px] w-full rounded border border-slate-200 dark:border-slate-800 overflow-hidden shadow-xs"
+        className="relative h-[480px] sm:h-[560px] md:h-[650px] w-full rounded border border-slate-200 dark:border-slate-800 overflow-hidden shadow-xs"
       >
         <GarmianMap
           parcels={filteredParcels}
@@ -504,8 +503,8 @@ export function GISClientView({
           conflictingParcelId={overlapResult.conflictingParcel?.id || null}
         />
 
-        {/* Map Legend Floating Box */}
-        <div className="absolute bottom-4 right-4 z-[400] rounded border border-slate-200 dark:border-slate-700 bg-white/95 dark:bg-slate-900/95 p-2.5 shadow-lg backdrop-blur-xs text-right text-xs space-y-1.5 pointer-events-auto">
+        {/* Map Legend Floating Box (Hidden on extra small mobile to save space) */}
+        <div className="hidden sm:block absolute bottom-4 right-4 z-[400] rounded border border-slate-200 dark:border-slate-700 bg-white/95 dark:bg-slate-900/95 p-2.5 shadow-lg backdrop-blur-xs text-right text-xs space-y-1.5 pointer-events-auto">
           <span className="font-bold text-[11px] text-slate-500 block border-b border-slate-200 dark:border-slate-800 pb-1">
             ڕێبەری ڕەنگەکانی کاداستری گەرمیان
           </span>
@@ -536,17 +535,17 @@ export function GISClientView({
         </div>
       </div>
 
-      {/* 5. DENSE ODOO DATA TABLE (BI-DIRECTIONAL SYNC) */}
+      {/* 5. DENSE ODOO DATA TABLE & MOBILE KANBAN (BI-DIRECTIONAL SYNC) */}
       <div className="rounded border border-[#DEE2E6] dark:border-slate-800 bg-white dark:bg-slate-900 overflow-hidden shadow-xs">
         {/* Table Title Bar */}
-        <div className="flex items-center justify-between px-4 py-2.5 border-b border-slate-200 dark:border-slate-800 bg-[#F8F9FA] dark:bg-slate-850">
+        <div className="flex items-center justify-between px-3 sm:px-4 py-2.5 border-b border-slate-200 dark:border-slate-800 bg-[#F8F9FA] dark:bg-slate-850">
           <div className="flex items-center gap-2">
             <div className="h-7 w-7 rounded bg-[#017E84] text-white flex items-center justify-center shadow-xs">
               <TableIcon className="h-4 w-4" />
             </div>
             <div>
               <h3 className="text-xs font-bold text-slate-900 dark:text-slate-100 flex items-center gap-1.5">
-                <span>تۆماری خشتەیی پارچە زەوییەکانی کاداستر</span>
+                <span>تۆماری خشتەیی پارچە زەوییەکان</span>
                 <span className="font-mono text-[11px] text-[#017E84] font-bold">
                   ({filteredParcels.length} تۆمار)
                 </span>
@@ -554,13 +553,13 @@ export function GISClientView({
             </div>
           </div>
 
-          <div className="text-xs text-slate-500">
+          <div className="hidden sm:block text-xs text-slate-500">
             کلیک لە هەر ڕیزێک بکە بۆ فڕینی کامێرای نەخشە و پێشاندانی وردەکاری
           </div>
         </div>
 
-        {/* Data Table */}
-        <div className="overflow-x-auto">
+        {/* Desktop Data Table */}
+        <div className="hidden md:block overflow-x-auto">
           <table className="w-full text-right border-collapse">
             <thead className="text-slate-700 dark:text-slate-300 border-b border-slate-200 dark:border-slate-800 bg-[#F1F2F6] dark:bg-slate-800 select-none">
               <tr className="h-9 text-xs font-semibold uppercase tracking-wider">
@@ -649,8 +648,8 @@ export function GISClientView({
                           className="px-2 py-1 rounded bg-[#017E84] hover:bg-[#00676C] text-white text-[11px] font-bold flex items-center gap-1 shadow-xs cursor-pointer"
                           title="چاپکردنی مۆڵەتی بیناسازی فەرمی (A4)"
                         >
-                          <Printer className="h-3 w-3" />
-                          <span>مۆڵەتی بیناسازی</span>
+                          <Printer className="h-3.5 w-3.5" />
+                          <span>مۆڵەت</span>
                         </button>
                       </div>
                     </td>
@@ -659,6 +658,88 @@ export function GISClientView({
               })}
             </tbody>
           </table>
+        </div>
+
+        {/* Mobile Odoo Kanban Card View */}
+        <div className="block md:hidden p-2.5 space-y-2.5">
+          {filteredParcels.map((parcel) => {
+            const isSelected = parcel.id === selectedParcel?.id;
+            return (
+              <div
+                key={parcel.id}
+                onClick={() => handleSelectParcel(parcel)}
+                className={cn(
+                  "p-3 rounded-lg border bg-white dark:bg-slate-850 shadow-xs transition-all active:scale-[0.99] cursor-pointer space-y-2",
+                  isSelected
+                    ? "border-[#017E84] ring-2 ring-[#017E84]/20 bg-[#E2F7F2]/40"
+                    : "border-slate-200 dark:border-slate-800 hover:border-slate-300"
+                )}
+              >
+                <div className="flex items-center justify-between">
+                  <span className="font-mono font-bold text-sm text-[#017E84]">
+                    پارچە {parcel.parcelNumber}
+                  </span>
+                  {parcel.status === "ALLOCATED" ? (
+                    <span className="inline-block px-2 py-0.5 rounded text-[11px] font-bold bg-blue-50 text-blue-700 border border-blue-200">
+                      تەرخانکراو
+                    </span>
+                  ) : parcel.status === "VACANT" ? (
+                    <span className="inline-block px-2 py-0.5 rounded text-[11px] font-bold bg-emerald-50 text-emerald-700 border border-emerald-200">
+                      بەتاڵ (گشتی)
+                    </span>
+                  ) : parcel.status === "DISPUTED" ? (
+                    <span className="inline-block px-2 py-0.5 rounded text-[11px] font-bold bg-red-50 text-red-700 border border-red-200">
+                      سەرپێچی
+                    </span>
+                  ) : (
+                    <span className="inline-block px-2 py-0.5 rounded text-[11px] font-bold bg-amber-50 text-amber-700 border border-amber-200">
+                      یەدەگ
+                    </span>
+                  )}
+                </div>
+
+                <div className="grid grid-cols-2 gap-1.5 text-xs">
+                  <div>
+                    <span className="text-slate-400 block text-[10px]">کەرت و شارەوانی</span>
+                    <span className="font-medium text-slate-800 dark:text-slate-200 truncate block">
+                      {parcel.zoneNumber} - {parcel.municipalityName}
+                    </span>
+                  </div>
+                  <div>
+                    <span className="text-slate-400 block text-[10px]">ڕووبەر و بەکارهێنان</span>
+                    <span className="font-mono font-bold text-slate-800 dark:text-slate-200">
+                      {parcel.areaSqm.toLocaleString()} م²
+                    </span>{" "}
+                    <span className="text-slate-500">({parcel.usageType})</span>
+                  </div>
+                </div>
+
+                <div className="pt-2 border-t border-slate-100 dark:border-slate-800 flex items-center justify-between">
+                  <span className="text-xs text-slate-600 dark:text-slate-400 truncate max-w-[140px]">
+                    {parcel.ownerName || "زەوی گشتی حکومەت"}
+                  </span>
+                  <div className="flex items-center gap-1.5" onClick={(e) => e.stopPropagation()}>
+                    <button
+                      type="button"
+                      onClick={() => handleSelectParcel(parcel)}
+                      className="px-2.5 py-1.5 rounded bg-slate-100 dark:bg-slate-800 hover:bg-slate-200 text-slate-700 dark:text-slate-300 text-xs font-semibold flex items-center gap-1 min-h-[36px]"
+                    >
+                      <Eye className="h-3.5 w-3.5 text-[#017E84]" />
+                      <span>نەخشە</span>
+                    </button>
+                    <button
+                      type="button"
+                      onClick={() => setPermitParcel(parcel)}
+                      className="px-2.5 py-1.5 rounded bg-[#017E84] hover:bg-[#00676C] text-white text-xs font-bold flex items-center gap-1 min-h-[36px]"
+                    >
+                      <Printer className="h-3.5 w-3.5" />
+                      <span>مۆڵەت</span>
+                    </button>
+                  </div>
+                </div>
+              </div>
+            );
+          })}
         </div>
       </div>
 

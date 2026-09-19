@@ -188,9 +188,10 @@ export function EDMSClientView({
         </div>
       </div>
 
-      {/* Documents List / Table */}
+      {/* Documents List / Table & Mobile Kanban */}
       <div className="rounded-2xl border border-border bg-card overflow-hidden shadow-sm">
-        <div className="overflow-x-auto">
+        {/* Desktop Table View */}
+        <div className="hidden md:block overflow-x-auto">
           <table className="w-full text-right text-xs">
             <thead className="bg-muted/40 text-muted-foreground border-b border-border">
               <tr>
@@ -302,6 +303,94 @@ export function EDMSClientView({
               )}
             </tbody>
           </table>
+        </div>
+
+        {/* Mobile Odoo Kanban Cards View */}
+        <div className="block md:hidden p-2.5 space-y-2.5">
+          {filteredDocs.length === 0 ? (
+            <div className="py-12 text-center text-xs text-muted-foreground">
+              هیچ نوسراوێک نەدۆزرایەوە بەپێی ئەم فلتەرە.
+            </div>
+          ) : (
+            filteredDocs.map((doc) => {
+              const statusInfo = getStatusPill(doc.status);
+              const StatusIcon = statusInfo.icon;
+
+              return (
+                <div
+                  key={doc.id}
+                  onClick={() => setSelectedDoc(doc)}
+                  className="p-3.5 rounded-xl border border-border bg-card shadow-xs transition-all active:scale-[0.99] cursor-pointer space-y-2.5 hover:border-border/80"
+                >
+                  <div className="flex items-center justify-between">
+                    <div className="flex items-center gap-1.5 font-mono font-bold text-xs text-amber-600 dark:text-amber-400">
+                      <Barcode className="h-4 w-4" />
+                      <span>{doc.barcode}</span>
+                    </div>
+                    <div className="flex items-center gap-1.5">
+                      <span
+                        className={`rounded-md border px-1.5 py-0.5 text-[10px] font-bold ${
+                          doc.urgency === "VERY_URGENT"
+                            ? "bg-red-500/10 text-red-600 border-red-500/20"
+                            : doc.urgency === "URGENT"
+                            ? "bg-amber-500/10 text-amber-600 border-amber-500/20"
+                            : "bg-emerald-500/10 text-emerald-600 border-emerald-500/20"
+                        }`}
+                      >
+                        {doc.urgency === "VERY_URGENT"
+                          ? "زۆر بەپەلە"
+                          : doc.urgency === "URGENT"
+                          ? "بەپەلە"
+                          : "ئاسایی"}
+                      </span>
+                      <div
+                        className={`inline-flex items-center gap-1 rounded-full border px-2 py-0.5 text-[10px] font-bold ${statusInfo.className}`}
+                      >
+                        <StatusIcon className="h-3 w-3" />
+                        <span>{statusInfo.label}</span>
+                      </div>
+                    </div>
+                  </div>
+
+                  <div>
+                    <h4 className="font-bold text-sm text-foreground leading-snug">
+                      {doc.subject}
+                    </h4>
+                    <div className="mt-1 flex items-center text-xs text-muted-foreground">
+                      <span className="font-medium text-foreground">
+                        {doc.senderMunicipalityName}
+                      </span>
+                      <span className="mx-1.5 text-xs">➜</span>
+                      <span className="font-medium text-foreground">
+                        {doc.destinationMunicipalityName}
+                      </span>
+                    </div>
+                  </div>
+
+                  <div className="pt-2 border-t border-border/60 flex items-center justify-between text-xs text-muted-foreground">
+                    <span>
+                      {new Date(doc.createdAt).toLocaleDateString("ku", {
+                        year: "numeric",
+                        month: "short",
+                        day: "numeric",
+                      })}
+                    </span>
+                    <button
+                      type="button"
+                      onClick={(e) => {
+                        e.stopPropagation();
+                        setSelectedDoc(doc);
+                      }}
+                      className="px-3 py-1.5 rounded-lg bg-accent text-accent-foreground text-xs font-bold flex items-center gap-1 min-h-[36px]"
+                    >
+                      <Eye className="h-3.5 w-3.5" />
+                      <span>وردەکاری</span>
+                    </button>
+                  </div>
+                </div>
+              );
+            })
+          )}
         </div>
       </div>
 

@@ -228,72 +228,136 @@ export default function ProjectsPage() {
 
       {/* LIST VIEW */}
       {viewMode === "list" && (
-        <div className="rounded border border-slate-200 dark:border-slate-800 bg-white dark:bg-slate-900 shadow-xs overflow-x-auto">
-          <table className="w-full text-right border-collapse">
-            <thead>
-              <tr className="border-b border-slate-200 dark:border-slate-800 bg-[#F1F2F6] dark:bg-slate-800 text-xs font-semibold uppercase tracking-wider text-slate-700 dark:text-slate-300 select-none">
-                <th className="py-2.5 px-3">کۆد</th>
-                <th className="py-2.5 px-3">ناوی پڕۆژەی ژێرخانی</th>
-                <th className="py-2.5 px-3">شارەوانی</th>
-                <th className="py-2.5 px-3">بەڵێندەری جێبەجێکار</th>
-                <th className="py-2.5 px-3 text-left">بودجەی تەرخانکراو (IQD)</th>
-                <th className="py-2.5 px-3 text-center">ڕێژەی تەواوبوون</th>
-                <th className="py-2.5 px-3 text-center">دۆخ</th>
-              </tr>
-            </thead>
-            <tbody className="divide-y divide-slate-100 dark:divide-slate-800 text-sm">
-              {filteredProjects.map((proj) => (
-                <tr
-                  key={proj.id}
-                  onClick={() => handleInspect(proj)}
-                  className="h-11 cursor-pointer transition-colors hover:bg-slate-100/70 dark:hover:bg-slate-800/60"
-                >
-                  <td className="py-2 px-3 font-mono text-xs font-bold text-[#017E84]">
-                    {proj.code}
-                  </td>
-                  <td className="py-2 px-3 font-bold text-slate-900 dark:text-slate-100 text-sm">
-                    {proj.title}
-                  </td>
-                  <td className="py-2 px-3 text-slate-700 dark:text-slate-300 text-xs">
-                    {proj.municipality}
-                  </td>
-                  <td className="py-2 px-3 text-slate-500 text-xs">
-                    {proj.contractor}
-                  </td>
-                  <td className="py-2 px-3 text-left font-mono font-bold text-slate-900 dark:text-slate-100 text-sm">
-                    {proj.budgetFormatted}
-                  </td>
-                  <td className="py-2 px-3 text-center">
-                    <div className="flex items-center gap-2 justify-center">
-                      <div className="w-20 h-2 bg-slate-200 dark:bg-slate-700 rounded-full overflow-hidden">
-                        <div
-                          className="h-full bg-[#017E84] rounded-full"
-                          style={{ width: `${proj.completionRate}%` }}
-                        />
-                      </div>
-                      <span className="font-mono text-xs font-bold">
-                        {proj.completionRate}%
-                      </span>
-                    </div>
-                  </td>
-                  <td className="py-2 px-3 text-center">
-                    <span
-                      className={cn(
-                        "text-xs px-2.5 py-0.5 rounded font-medium",
-                        proj.completionRate >= 90
-                          ? "odoo-badge-approved"
-                          : proj.completionRate >= 40
-                          ? "odoo-badge-pending"
-                          : "bg-slate-100 text-slate-700 dark:bg-slate-800 dark:text-slate-300"
-                      )}
-                    >
-                      {proj.status}
-                    </span>
-                  </td>
+        <div className="rounded border border-slate-200 dark:border-slate-800 bg-white dark:bg-slate-900 shadow-xs overflow-hidden">
+          {/* Desktop Table */}
+          <div className="hidden md:block overflow-x-auto">
+            <table className="w-full text-right border-collapse">
+              <thead>
+                <tr className="border-b border-slate-200 dark:border-slate-800 bg-[#F1F2F6] dark:bg-slate-800 text-xs font-semibold uppercase tracking-wider text-slate-700 dark:text-slate-300 select-none">
+                  <th className="py-2.5 px-3">کۆد</th>
+                  <th className="py-2.5 px-3">ناوی پڕۆژەی ژێرخانی</th>
+                  <th className="py-2.5 px-3">شارەوانی</th>
+                  <th className="py-2.5 px-3">بەڵێندەری جێبەجێکار</th>
+                  <th className="py-2.5 px-3 text-left">بودجەی تەرخانکراو (IQD)</th>
+                  <th className="py-2.5 px-3 text-center">ڕێژەی تەواوبوون</th>
+                  <th className="py-2.5 px-3 text-center">دۆخ</th>
                 </tr>
-              ))}
-            </tbody>
-          </table>
+              </thead>
+              <tbody className="divide-y divide-slate-100 dark:divide-slate-800 text-sm">
+                {filteredProjects.map((proj) => (
+                  <tr
+                    key={proj.id}
+                    onClick={() => handleInspect(proj)}
+                    className="h-11 cursor-pointer transition-colors hover:bg-slate-100/70 dark:hover:bg-slate-800/60"
+                  >
+                    <td className="py-2 px-3 font-mono text-xs font-bold text-[#017E84]">
+                      {proj.code}
+                    </td>
+                    <td className="py-2 px-3 font-bold text-slate-900 dark:text-slate-100 text-sm">
+                      {proj.title}
+                    </td>
+                    <td className="py-2 px-3 text-slate-700 dark:text-slate-300 text-xs">
+                      {proj.municipality}
+                    </td>
+                    <td className="py-2 px-3 text-slate-500 text-xs">
+                      {proj.contractor}
+                    </td>
+                    <td className="py-2 px-3 text-left font-mono font-bold text-slate-900 dark:text-slate-100 text-sm">
+                      {proj.budgetFormatted}
+                    </td>
+                    <td className="py-2 px-3 text-center">
+                      <div className="flex items-center gap-2 justify-center">
+                        <div className="w-20 h-2 bg-slate-200 dark:bg-slate-700 rounded-full overflow-hidden">
+                          <div
+                            className="h-full bg-[#017E84] rounded-full"
+                            style={{ width: `${proj.completionRate}%` }}
+                          />
+                        </div>
+                        <span className="font-mono text-xs font-bold">
+                          {proj.completionRate}%
+                        </span>
+                      </div>
+                    </td>
+                    <td className="py-2 px-3 text-center">
+                      <span
+                        className={cn(
+                          "text-xs px-2.5 py-0.5 rounded font-medium",
+                          proj.completionRate >= 90
+                            ? "odoo-badge-approved"
+                            : proj.completionRate >= 40
+                            ? "odoo-badge-pending"
+                            : "bg-slate-100 text-slate-700 dark:bg-slate-800 dark:text-slate-300"
+                        )}
+                      >
+                        {proj.status}
+                      </span>
+                    </td>
+                  </tr>
+                ))}
+              </tbody>
+            </table>
+          </div>
+
+          {/* Mobile Adaptive Kanban Cards for List Mode */}
+          <div className="block md:hidden p-2.5 space-y-2.5">
+            {filteredProjects.map((proj) => (
+              <div
+                key={proj.id}
+                onClick={() => handleInspect(proj)}
+                className="p-3.5 rounded-lg border border-slate-200 dark:border-slate-800 bg-white dark:bg-slate-850 shadow-xs active:scale-[0.99] transition-all cursor-pointer space-y-2.5"
+              >
+                <div className="flex items-center justify-between">
+                  <span className="font-mono text-xs font-bold text-[#017E84] bg-teal-50 dark:bg-teal-950/40 px-2 py-0.5 rounded border border-teal-200 dark:border-teal-800">
+                    {proj.code}
+                  </span>
+                  <span
+                    className={cn(
+                      "text-xs px-2 py-0.5 rounded font-medium",
+                      proj.completionRate >= 90
+                        ? "odoo-badge-approved"
+                        : proj.completionRate >= 40
+                        ? "odoo-badge-pending"
+                        : "bg-slate-100 text-slate-700 dark:bg-slate-800"
+                    )}
+                  >
+                    {proj.status}
+                  </span>
+                </div>
+
+                <h3 className="font-bold text-slate-900 dark:text-slate-100 text-sm leading-snug">
+                  {proj.title}
+                </h3>
+
+                <div className="grid grid-cols-2 gap-1 text-xs text-slate-500 border-t border-slate-100 dark:border-slate-800 pt-2">
+                  <div>
+                    <span className="text-[10px] text-slate-400 block">شارەوانی:</span>
+                    <span className="font-semibold text-slate-800 dark:text-slate-200 truncate block">
+                      {proj.municipality}
+                    </span>
+                  </div>
+                  <div>
+                    <span className="text-[10px] text-slate-400 block">بودجە:</span>
+                    <span className="font-mono font-bold text-[#017E84]">
+                      {proj.budgetFormatted}
+                    </span>
+                  </div>
+                </div>
+
+                <div className="space-y-1 pt-1">
+                  <div className="flex justify-between text-xs font-mono font-bold">
+                    <span>ڕێژەی ئەنجامدان:</span>
+                    <span>{proj.completionRate}%</span>
+                  </div>
+                  <div className="w-full h-2 bg-slate-200 dark:bg-slate-700 rounded-full overflow-hidden">
+                    <div
+                      className="h-full bg-[#017E84] rounded-full"
+                      style={{ width: `${proj.completionRate}%` }}
+                    />
+                  </div>
+                </div>
+              </div>
+            ))}
+          </div>
         </div>
       )}
 

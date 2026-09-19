@@ -68,31 +68,42 @@ export function ParcelDrawer({
   const StatusIcon = statusInfo.icon;
 
   return (
-    <div className="fixed inset-y-0 left-0 z-50 w-full sm:w-96 md:w-[420px] bg-white dark:bg-slate-900 border-r border-slate-200 dark:border-slate-800 shadow-2xl flex flex-col animate-in slide-in-from-left duration-200">
-      {/* Header */}
-      <div className="p-4 border-b border-slate-200 dark:border-slate-800 flex items-center justify-between bg-[#F8F9FA] dark:bg-slate-850">
-        <div className="flex items-center gap-2 text-right">
-          <div className="h-8 w-8 rounded bg-[#714B67] text-white flex items-center justify-center shadow-xs">
-            <Building2 className="h-4 w-4" />
+    <>
+      {/* Semi-transparent Backdrop */}
+      <div
+        className="fixed inset-0 z-40 bg-black/50 backdrop-blur-xs transition-opacity"
+        onClick={onClose}
+      />
+
+      {/* Adaptive Drawer: Native Bottom Sheet on Mobile (<768px), Left Side Panel on Desktop (>=768px) */}
+      <div className="fixed bottom-0 left-0 right-0 z-50 max-h-[75vh] h-auto rounded-t-3xl border-t border-slate-200 dark:border-slate-800 bg-white dark:bg-slate-900 shadow-2xl flex flex-col animate-in slide-in-from-bottom duration-200 md:bottom-auto md:top-0 md:left-0 md:w-[420px] md:h-full md:max-h-none md:rounded-none md:border-r md:border-t-0 md:slide-in-from-left">
+        {/* Mobile Pull Handle */}
+        <div className="w-12 h-1.5 rounded-full bg-slate-300 dark:bg-slate-700 mx-auto mt-2.5 mb-1 md:hidden shrink-0" />
+
+        {/* Header */}
+        <div className="p-3.5 sm:p-4 border-b border-slate-200 dark:border-slate-800 flex items-center justify-between bg-[#F8F9FA] dark:bg-slate-850 shrink-0">
+          <div className="flex items-center gap-2 text-right">
+            <div className="h-8 w-8 rounded-lg bg-[#714B67] text-white flex items-center justify-center shadow-xs">
+              <Building2 className="h-4 w-4" />
+            </div>
+            <div>
+              <h3 className="font-bold text-sm text-slate-900 dark:text-slate-100">
+                سەنەد و زانیاری کاداستر
+              </h3>
+              <span className="text-[11px] text-slate-500">
+                تۆماری فەرمی شارەوانییەکانی گەرمیان
+              </span>
+            </div>
           </div>
-          <div>
-            <h3 className="font-bold text-sm text-slate-900 dark:text-slate-100">
-              زانیاری و سەنەدی کاداستر
-            </h3>
-            <span className="text-[11px] text-slate-500">
-              تۆماری فەرمی بەڕێوەبەرایەتی شارەوانییەکانی گەرمیان
-            </span>
-          </div>
+          <button
+            type="button"
+            onClick={onClose}
+            className="h-9 w-9 sm:h-8 sm:w-8 rounded-lg border border-slate-200 dark:border-slate-700 flex items-center justify-center hover:bg-slate-100 dark:hover:bg-slate-800 text-slate-500 hover:text-slate-800 transition-colors cursor-pointer"
+            aria-label="داخستن"
+          >
+            <X className="h-4 w-4" />
+          </button>
         </div>
-        <button
-          type="button"
-          onClick={onClose}
-          className="h-8 w-8 rounded border border-slate-200 dark:border-slate-700 flex items-center justify-center hover:bg-slate-100 dark:hover:bg-slate-800 text-slate-500 hover:text-slate-800 transition-colors cursor-pointer"
-          aria-label="داخستن"
-        >
-          <X className="h-4 w-4" />
-        </button>
-      </div>
 
       {/* Body Details */}
       <div className="flex-1 overflow-y-auto p-4 space-y-4 text-right font-sans">
@@ -227,5 +238,6 @@ export function ParcelDrawer({
         </button>
       </div>
     </div>
-  );
+  </>
+);
 }
