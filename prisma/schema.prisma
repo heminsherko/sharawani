@@ -1,0 +1,263 @@
+// Prisma schema for General Directorate of Municipalities of Garmian (بەڕێوەبەرایەتی گشتی شارەوانییەکانی گەرمیان)
+// Enterprise Municipal Management System (ERP & GIS)
+
+generator client {
+  provider = "prisma-client-js"
+}
+
+datasource db {
+  provider = "postgresql"
+  url      = env("DATABASE_URL")
+}
+
+// -------------------------------------------------------------
+// ENUMS
+// -------------------------------------------------------------
+
+enum MunicipalityTier {
+  HEADQUARTER
+  TIER_1
+  TIER_2
+  TIER_3
+}
+
+enum UserRole {
+  DIRECTOR_GENERAL
+  MAYOR
+  HEAD_OF_DEPT
+  ENGINEER
+  LAND_OFFICER
+  FINANCE_OFFICER
+  AUDITOR
+}
+
+enum ParcelStatus {
+  VACANT
+  ALLOCATED
+  RESERVED
+  DISPUTED
+}
+
+enum DocumentUrgency {
+  NORMAL
+  URGENT
+  VERY_URGENT
+}
+
+enum DocumentStatus {
+  DRAFT
+  DISPATCHED
+  IN_TRANSIT
+  RECEIVED
+  ARCHIVED
+  REJECTED
+}
+
+enum RouteAction {
+  FORWARD
+  APPROVE
+  REJECT
+  COMMENT
+  ARCHIVE
+}
+
+enum ProjectStatus {
+  TENDER
+  ONGOING
+  COMPLETED
+}
+
+enum InvoiceStatus {
+  PENDING
+  PAID
+}
+
+// -------------------------------------------------------------
+// MODELS
+// -------------------------------------------------------------
+
+model Municipality {
+  id             String           @id @default(uuid())
+  nameKrd        String           @map("name_krd")
+  nameEng        String           @map("name_eng")
+  code           String           @unique
+  tier           MunicipalityTier
+  isHeadquarter  Boolean          @default(false) @map("is_headquarter")
+
+  // Relations
+  departments     Department[]
+  users           User[]
+  parcels         Parcel[]
+  sentDocuments   Document[]       @relation("SenderMunicipality")
+  receivedRoutes  DocumentRoute[]  @relation("RouteToMunicipality")
+  projects        Project[]
+  invoices        RevenueInvoice[]
+
+  createdAt       DateTime         @default(now()) @map("created_at")
+  updatedAt       DateTime         @updatedAt @map("updated_at")
+
+  @@map("municipalities")
+}
+
+model Department {
+  id             String       @id @default(uuid())
+  municipalityId String       @map("municipality_id")
+  name           String
+  code           String
+
+  municipality   Municipality @relation(fields: [municipalityId], references: [id], onDelete: Cascade)
+  users          User[]
+
+  createdAt      DateTime     @default(now()) @map("created_at")
+  updatedAt      DateTime     @updatedAt @map("updated_at")
+
+  @@unique([municipalityId, code])
+  @@map("departments")
+}
+
+model User {
+  id             String       @id @default(uuid())
+  fullName       String       @map("full_name")
+  phone          String       @unique
+  nationalId     String       @unique @map("national_id")
+  passwordHash   String       @map("password_hash")
+  role           UserRole
+  municipalityId String       @map("municipality_id")
+  departmentId   String?      @map("department_id")
+
+  // Relations
+  municipality   Municipality @relation(fields: [municipalityId], references: [id], onDelete: Restrict)
+  department     Department?  @relation(fields: [departmentId], references: [id], onDelete: SetNull)
+
+  heldDocuments  Document[]       @relation("CurrentDocumentHolder")
+  sentRoutes     DocumentRoute[]  @relation("RouteSender")
+  receivedRoutes DocumentRoute[]  @relation("RouteRecipient")
+  auditLogs      AuditLog[]
+
+  createdAt      DateTime     @default(now()) @map("created_at")
+  updatedAt      DateTime     @updatedAt @map("updated_at")
+
+  @@map("users")
+}
+
+model Parcel {
+  id              String       @id @default(uuid())
+  municipalityId  String       @map("municipality_id")
+  zoneNumber      String       @map("zone_number")
+  parcelNumber    String       @map("parcel_number")
+  areaSqm         Float        @map("area_sqm")
+  status          ParcelStatus @default(VACANT)
+  usageType       String       @map("usage_type") // Residential, Commercial, Industrial, Agricultural, Public
+  ownerName       String?      @map("owner_name")
+  ownerNationalId String?      @map("owner_national_id")
+  coordinatesJson Json?        @map("coordinates_json") // GeoJSON polygon / point data for GIS
+
+  municipality    Municipality @relation(fields: [municipalityId], references: [id], onDelete: Restrict)
+
+  createdAt       DateTime     @default(now()) @map("created_at")
+  updatedAt       DateTime     @updatedAt @map("updated_at")
+
+  @@unique([municipalityId, zoneNumber, parcelNumber])
+  @@index([municipalityId, status])
+  @@index([ownerNationalId])
+  @@map("parcels")
+}
+
+model Document {
+  id                   String          @id @default(uuid())
+  barcode              String          @unique
+  subject              String
+  urgency              DocumentUrgency @default(NORMAL)
+  status               DocumentStatus  @default(DISPATCHED)
+  senderMunicipalityId String          @map("sender_municipality_id")
+  currentHolderId      String?         @map("current_holder_id")
+
+  // Relations
+  senderMunicipality   Municipality    @relation("SenderMunicipality", fields: [senderMunicipalityId], references: [id], onDelete: Restrict)
+  currentHolder        User?           @relation("CurrentDocumentHolder", fields: [currentHolderId], references: [id], onDelete: SetNull)
+  routes               DocumentRoute[]
+
+  createdAt            DateTime        @default(now()) @map("created_at")
+  updatedAt            DateTime        @updatedAt @map("updated_at")
+
+  @@index([barcode])
+  @@index([status])
+  @@map("documents")
+}
+
+model DocumentRoute {
+  id               String       @id @default(uuid())
+  documentId       String       @map("document_id")
+  fromUserId       String       @map("from_user_id")
+  toUserId         String?      @map("to_user_id")
+  toMunicipalityId String?      @map("to_municipality_id")
+  action           RouteAction  @default(FORWARD)
+  notes            String?
+
+  document         Document      @relation(fields: [documentId], references: [id], onDelete: Cascade)
+  fromUser         User          @relation("RouteSender", fields: [fromUserId], references: [id], onDelete: Restrict)
+  toUser           User?         @relation("RouteRecipient", fields: [toUserId], references: [id], onDelete: SetNull)
+  toMunicipality   Municipality? @relation("RouteToMunicipality", fields: [toMunicipalityId], references: [id], onDelete: SetNull)
+
+  routedAt         DateTime      @default(now()) @map("routed_at")
+
+  @@map("document_routes")
+}
+
+model Project {
+  id             String        @id @default(uuid())
+  municipalityId String        @map("municipality_id")
+  title          String
+  budget         Decimal       @db.Decimal(18, 2)
+  contractor     String
+  completionRate Float         @default(0.0) @map("completion_rate") // e.g. 0 to 100%
+  status         ProjectStatus @default(TENDER)
+  startDate      DateTime?     @map("start_date")
+  endDate        DateTime?     @map("end_date")
+
+  municipality   Municipality  @relation(fields: [municipalityId], references: [id], onDelete: Restrict)
+
+  createdAt      DateTime      @default(now()) @map("created_at")
+  updatedAt      DateTime      @updatedAt @map("updated_at")
+
+  @@index([municipalityId, status])
+  @@map("projects")
+}
+
+model RevenueInvoice {
+  id             String        @id @default(uuid())
+  invoiceNumber  String        @unique @map("invoice_number")
+  municipalityId String        @map("municipality_id")
+  payerName      String        @map("payer_name")
+  amount         Decimal       @db.Decimal(18, 2)
+  type           String        // Rent, Permit, Fine, ServiceFee
+  status         InvoiceStatus @default(PENDING)
+  dueDate        DateTime?     @map("due_date")
+  paidAt         DateTime?     @map("paid_at")
+
+  municipality   Municipality  @relation(fields: [municipalityId], references: [id], onDelete: Restrict)
+
+  createdAt      DateTime      @default(now()) @map("created_at")
+  updatedAt      DateTime      @updatedAt @map("updated_at")
+
+  @@index([municipalityId, status])
+  @@map("revenue_invoices")
+}
+
+model AuditLog {
+  id          String   @id @default(uuid())
+  userId      String?  @map("user_id")
+  action      String
+  entity      String
+  entityId    String   @map("entity_id")
+  changesJson Json?    @map("changes_json")
+  ipAddress   String?  @map("ip_address")
+  timestamp   DateTime @default(now())
+
+  user        User?    @relation(fields: [userId], references: [id], onDelete: SetNull)
+
+  @@index([entity, entityId])
+  @@index([timestamp])
+  @@map("audit_logs")
+}
+

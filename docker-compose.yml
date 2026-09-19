@@ -1,0 +1,81 @@
+version: "3.8"
+
+services:
+  # ---------------------------------------------------------------------------
+  # PostgreSQL + PostGIS (Spatial Database for GIS & Municipal ERP)
+  # ---------------------------------------------------------------------------
+  postgres:
+    image: postgis/postgis:15-3.3
+    container_name: garmian_postgres_gis
+    restart: unless-stopped
+    environment:
+      POSTGRES_USER: ${POSTGRES_USER:-garmian_admin}
+      POSTGRES_PASSWORD: ${POSTGRES_PASSWORD:-Garmian@Gov2026}
+      POSTGRES_DB: ${POSTGRES_DB:-garmian_municipality_erp}
+    ports:
+      - "5432:5432"
+    volumes:
+      - postgres_data:/var/lib/postgresql/data
+    healthcheck:
+      test: ["CMD-SHELL", "pg_isready -U ${POSTGRES_USER:-garmian_admin} -d ${POSTGRES_DB:-garmian_municipality_erp}"]
+      interval: 10s
+      timeout: 5s
+      retries: 5
+    networks:
+      - garmian_network
+
+  # ---------------------------------------------------------------------------
+  # MinIO (S3-Compatible Local Object Storage for EDMS Documents & GIS CAD)
+  # ---------------------------------------------------------------------------
+  minio:
+    image: minio/minio:latest
+    container_name: garmian_minio_s3
+    restart: unless-stopped
+    command: server /data --console-address ":9001"
+    environment:
+      MINIO_ROOT_USER: ${MINIO_ROOT_USER:-minio_admin}
+      MINIO_ROOT_PASSWORD: ${MINIO_ROOT_PASSWORD:-GarmianMinio@2026}
+    ports:
+      - "9000:9000" # MinIO S3 API Port
+      - "9001:9001" # MinIO Web Console UI Port
+    volumes:
+      - minio_data:/data
+    healthcheck:
+      test: ["CMD", "curl", "-f", "http://localhost:9000/minio/health/live"]
+      interval: 15s
+      timeout: 5s
+      retries: 3
+    networks:
+      - garmian_network
+
+  # ---------------------------------------------------------------------------
+  # MinIO Bucket Auto-Provisioning (Creates Initial Municipal Buckets)
+  # ---------------------------------------------------------------------------
+  minio-init:
+    image: minio/mc:latest
+    container_name: garmian_minio_provisioner
+    depends_on:
+      minio:
+        condition: service_healthy
+    entrypoint: >
+      /bin/sh -c "
+      /usr/bin/mc alias set myminio http://minio:9000 ${MINIO_ROOT_USER:-minio_admin} ${MINIO_ROOT_PASSWORD:-GarmianMinio@2026};
+      /usr/bin/mc mb --ignore-existing myminio/garmian-edms-documents;
+      /usr/bin/mc mb --ignore-existing myminio/garmian-gis-parcels;
+      /usr/bin/mc anonymous set download myminio/garmian-edms-documents;
+      exit 0;
+      "
+    networks:
+      - garmian_network
+
+volumes:
+  postgres_data:
+    name: garmian_postgres_volume
+  minio_data:
+    name: garmian_minio_volume
+
+networks:
+  garmian_network:
+    name: garmian_municipal_net
+    driver: bridge
+
